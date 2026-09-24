@@ -45,11 +45,14 @@ all rather than a stale number.
 
 **Contrib engines are launch + badge only.** Rove ships a catalog of
 well-known coding CLIs (`gemini`, `opencode`, `cursor`, `grok`, `droid`,
-`amp`, `devin`, `qodercli`, `cline`, `kiro`, `maki`, `antigravity`) so they appear in the engine selector whenever the binary is on your
+`amp`, `devin`, `qodercli`, `cline`, `kiro`, `maki`, `antigravity`, `bob`) so they appear in the engine selector whenever the binary is on your
 PATH, with a proper name, a launch command, and screen-based activity
 badges. A catalog entry also declares how its CLI takes a first message:
-OpenCode's positional argument is a project directory, so Rove pastes the
-prompt after launch instead of appending it to the command line.
+OpenCode's positional argument is a project directory, and IBM Bob's `bob
+chat` discards a positional outright, so Rove pastes the prompt after launch
+for both instead of appending it to the command line. Bob also launches as
+`bob chat --trust`, because its first-run folder dialog would otherwise stop
+every task Rove spawns into a fresh worktree.
 Settings → Engines lists them (and your own registered engines) with their
 binary discovery, and that is all detection can answer for them. No
 login state, history, or model picker; those need a real adapter, which is
