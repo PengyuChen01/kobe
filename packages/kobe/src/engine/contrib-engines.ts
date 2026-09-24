@@ -237,41 +237,8 @@ const QODERCLI: EngineScreenManifest = {
   ],
 }
 
-// Captured from Bob Shell 2.0.4 under a PTY, re-verified unchanged on 2.0.5.
-// Three screens wait on a human: the sign-in wall, the folder gate, and the
-// COMMAND approval dialog — a
-// file-write approval was not captured, so it is covered only if it shares the
-// "Approve Once" option list. The composer's mode footer ("Agent Mode · 74.8k
-// / 270.0k (28%) · 0.149") is drawn while streaming too, so it can only mean
-// idle once the working rule above it has missed.
-const BOB: EngineScreenManifest = {
-  rules: [
-    // An expired token parks Bob on a browser sign-in spinner. Without this it
-    // classifies null, so a task that CANNOT run keeps whatever badge it had.
-    { state: "blocked", any: ["complete sign-in in your browser"] },
-    { state: "blocked", all: ["do you trust this folder?"], any: ["trust folder", "don't trust"] },
-    { state: "blocked", all: ["approve once"], any: ["reject", "always allow"] },
-    { state: "working", any: ["enter to steer", "tab to queue"] },
-    { state: "idle", lineRegex: ["^\\s*\\w[\\w ]* mode( \u00b7|\\s*$)"] },
-  ],
-}
-
 /** The shipped catalog. Key = the engine's VendorId. */
 export const CONTRIB_ENGINES: Record<string, ContribEngineSpec> = {
-  // `bob chat` is the documented TUI subcommand. `--trust` is Bob's own
-  // flag for the first-run folder gate — without it every task Rove spawns
-  // into a fresh worktree stops on "Do you trust this folder?", which makes a
-  // parallel round N dialogs nobody can answer (see `trust-worktree.ts` for
-  // the same problem in the built-ins).
-  // "paste", not "argv": `bob chat` declares no positional, and Bob 2.0.4
-  // SILENTLY DROPS one rather than failing — an argv first message would
-  // leave every sibling of a fan-out sitting at an empty composer.
-  bob: {
-    displayName: "IBM Bob",
-    defaultCommand: ["bob", "chat", "--trust"],
-    screenManifest: BOB,
-    firstMessageDelivery: "paste",
-  },
   gemini: { displayName: "Gemini CLI", defaultCommand: ["gemini"], screenManifest: GEMINI },
   // opencode's positional is a project DIRECTORY: an argv first message exits
   // `Failed to change directory to <cwd>/<prompt>` (opencode 0.6.3). Other

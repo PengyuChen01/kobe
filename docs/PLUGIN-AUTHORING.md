@@ -193,7 +193,7 @@ pattern = "\\.(png|jpg)$"        # JS regex, case-insensitive, vs the file name
 action = "greet"                 # your action, invoked with the absolute path
 
 [[engines]]                      # contribute a coding-CLI engine
-id = "aider"                     # VendorId; may not shadow a built-in (claude/codex/copilot/kimi/pi/omp) or shipped engine (gemini/opencode/cursor/grok/droid/amp/devin/qodercli/cline/kiro/maki/antigravity/bob)
+id = "aider"                     # VendorId; may not shadow a built-in (claude/codex/copilot/kimi/pi/omp/bob) or shipped engine (gemini/opencode/cursor/grok/droid/amp/devin/qodercli/cline/kiro/maki/antigravity)
 name = "Aider"                   # display name in the selector and Settings
 command = ["aider"]              # launch argv; argv[0] is the binary
 # process_names = ["aider-core"] # extra ps basenames (post-launch renames)
@@ -515,6 +515,6 @@ Runnable example: [`examples/row-tokens/`](../packages/kobe-plugin-sdk/examples/
   Marketplace alike — but nothing is sandboxed.
   Keep your repo auditable. That's what gets you installed.
 - Reference implementations: the first-party plugins in
-  [Sma1lboy/rove-plugins](https://github.com/Sma1lboy/rove-plugins)
+  [Sma1lboy/kobe-plugins](https://github.com/Sma1lboy/kobe-plugins)
   (notifications, GitHub/Linear task starters, lazygit pane, Chromium pane,
   the character-cell video player).
