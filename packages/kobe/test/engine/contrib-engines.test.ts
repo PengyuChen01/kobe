@@ -24,12 +24,22 @@ describe("contrib engine catalog", () => {
   // first message becomes a path and the launch dies before the engine is up
   // ("Failed to change directory to <cwd>/<the prompt>"). Same class as kimi,
   // same fix: the spawner pastes it instead.
-  it("opencode declares paste delivery; the rest keep the argv default", () => {
-    expect(engineEntry("opencode").firstMessageDelivery).toBe("paste")
+  // Bob 2.0.4 is the worse shape: `bob chat` declares no positional and DROPS a
+  // stray one without an error, so an argv first message leaves the session at
+  // an empty composer — every sibling of a parallel round silently promptless.
+  it("opencode and bob declare paste delivery; the rest keep the argv default", () => {
+    const paste = new Set(["opencode", "bob"])
     for (const id of CONTRIB_ENGINE_IDS) {
-      if (id === "opencode") continue
-      expect(engineEntry(id).firstMessageDelivery, id).toBeUndefined()
+      const delivery = engineEntry(id).firstMessageDelivery
+      if (paste.has(id)) expect(delivery, id).toBe("paste")
+      else expect(delivery, id).toBeUndefined()
     }
+  })
+
+  // `bob` alone only prints help, and a fresh worktree stops the TUI on a trust
+  // dialog — a parallel round would open N of them with nobody to answer.
+  it("bob launches the TUI already trusting the worktree", () => {
+    expect(engineEntry("bob").defaultCommand).toEqual(["bob", "chat", "--trust"])
   })
 
   it("every catalog manifest declares blocked rules before working rules", () => {
