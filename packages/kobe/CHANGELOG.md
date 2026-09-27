@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.9.230
+
+### Patch Changes
+
+- [#1143](https://github.com/Sma1lboy/rove/pull/1143) [`78838bb`](https://github.com/Sma1lboy/rove/commit/78838bbe4fc5081e875973f5ad6ec94009aebf90) The first-party plugin repo is now `Sma1lboy/rove-plugins`: `rove plugin search`, Settings → Marketplace, and rove.run/plugins list `Sma1lboy/rove-plugins/<name>`. Old `Sma1lboy/kobe-plugins/...` installs keep working through GitHub's redirect and still show as installed in the marketplace. — [@Sma1lboy](https://github.com/Sma1lboy)
+
 ## 0.9.229
 
 ### Patch Changes
