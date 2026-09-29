@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.9.233
+
+### Patch Changes
+
+- [#1150](https://github.com/Sma1lboy/rove/pull/1150) [`7420eb0`](https://github.com/Sma1lboy/rove/commit/7420eb06a3c32f255fc9c4119b8239c42fa6b47d) A running agent's spinner now breathes: it speeds up and brightens to the theme accent, then slows and fades, on a 2.4-second cycle, instead of ticking at a flat rate. This applies in the sidebar, the folded rail and the Inbox. — [@Sma1lboy](https://github.com/Sma1lboy)
+
 ## 0.9.232
 
 ### Patch Changes
