@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.9.235
+
+### Patch Changes
+
+- [#1152](https://github.com/Sma1lboy/rove/pull/1152) [`9684066`](https://github.com/Sma1lboy/rove/commit/96840666f6903fd4be871d8798f1835e8e524926) Hovering the mouse over a terminal pane now reaches the program inside it when that program asks for all mouse motion. Claude Code's fullscreen view highlights the tool call row under the pointer, the same as in a standalone terminal. — [@Sma1lboy](https://github.com/Sma1lboy)
+
 ## 0.9.234
 
 ### Patch Changes
