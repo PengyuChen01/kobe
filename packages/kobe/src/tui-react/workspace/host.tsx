@@ -9,6 +9,7 @@
 import { useRenderer, useTerminalDimensions } from "@opentui/react"
 import { useEffect, useRef, useState } from "react"
 import type { RemoteOrchestrator } from "../../client/remote-orchestrator.ts"
+import { DEFAULT_WORKING_BORDER, WORKING_BORDER_KEY, normalizeWorkingBorder } from "../../state/working-border"
 import { PrefixHud } from "../component/prefix-hud"
 import { ToastOverlay } from "../component/toast-overlay"
 import { useWhatsNewDialog } from "../component/whats-new-dialog"
@@ -20,6 +21,7 @@ import { useT } from "../i18n"
 import { RenderProfiler } from "../lib/render-profiler"
 import { useDaemonNotices } from "../lib/use-daemon-notices"
 import { useWelcomeDialog } from "../onboarding/host"
+import { useSpinnerFrame } from "../panes/sidebar/row-cards"
 import { useSidebarHostState } from "../panes/sidebar/use-sidebar-host-state.tsx"
 import { useDialog } from "../ui/dialog"
 import { DialogConfirm } from "../ui/dialog-confirm"
@@ -32,6 +34,7 @@ import { HostSidebarMount } from "./host-sidebar-mount"
 import { useWorkspaceTaskActions } from "./host-task-actions"
 import { openTaskWorktreeFor } from "./open-task-worktree"
 import { useQuickFork } from "./quick-fork"
+import { runningPaneFlow, runningPaneTitle } from "./running-pane-chrome"
 import { selfRefreshAction } from "./self-refresh-action"
 import { ShowWorkspace } from "./show-workspace"
 import { useSidebarResizeGesture } from "./sidebar-resize-gesture"
@@ -109,6 +112,11 @@ export function WorkspaceRoot(props: { orchestrator: RemoteOrchestrator } & Boot
     notifyError,
   })
   const worktree = selectedTask?.worktreePath || null
+  const workingFlow =
+    selectedId !== null &&
+    engineState?.get(selectedId)?.state === "running" &&
+    normalizeWorkingBorder(kv.get(WORKING_BORDER_KEY, DEFAULT_WORKING_BORDER)) === "flow"
+  const breath = useSpinnerFrame(workingFlow)
 
   const { sortMode, toggleSortMode, moveMode, setMoveMode, onLocalMergeRequest } = useSidebarHostState({
     kv,
@@ -367,6 +375,16 @@ export function WorkspaceRoot(props: { orchestrator: RemoteOrchestrator } & Boot
           flexShrink={1}
           borderStyle="rounded"
           borderColor={focus.focused === "workspace" ? theme.focusAccent : inactiveBorder}
+          renderAfter={
+            workingFlow
+              ? runningPaneFlow(theme.focusAccent, inactiveBorder, focus.focused === "workspace", breath)
+              : undefined
+          }
+          title={
+            workingFlow && selectedTask
+              ? runningPaneTitle(selectedTask.title, t("workspace.inbox.state.running"))
+              : undefined
+          }
           onMouseUp={() => focus.setFocused("workspace")}
         >
           {/* The rail swaps THIS pane, not the whole window — the task list on
