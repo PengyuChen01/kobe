@@ -23,7 +23,7 @@
  * land.
  */
 
-import { describe, expect, it } from "bun:test"
+import { afterEach, describe, expect, it } from "bun:test"
 import { mkdtempSync } from "node:fs"
 import { tmpdir } from "node:os"
 import { join } from "node:path"
@@ -107,9 +107,20 @@ async function withEngineSettings(
   const [api, kv] = await ready
   await run(api)
   await settle()
+  // The kv write is debounced and resolves its path from KOBE_HOME_DIR when it
+  // fires; flush now so no late write lands in whatever home runs next.
+  kv.flush()
   handle.destroy()
   return (key: string) => kv.get(key, undefined)
 }
+
+// Each run points KOBE_HOME_DIR at a fresh dir; restore it so the next file's
+// state.json lives where its readers look.
+const originalHome = process.env.KOBE_HOME_DIR
+afterEach(() => {
+  if (originalHome === undefined) Reflect.deleteProperty(process.env, "KOBE_HOME_DIR")
+  else process.env.KOBE_HOME_DIR = originalHome
+})
 
 describe("Settings → Engines protocol declaration", () => {
   it("records a declared protocol alongside the command and name", async () => {
