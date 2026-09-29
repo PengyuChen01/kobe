@@ -1,5 +1,13 @@
 # Changelog
 
+## 0.9.232
+
+### Patch Changes
+
+- [#1149](https://github.com/Sma1lboy/rove/pull/1149) [`efed882`](https://github.com/Sma1lboy/rove/commit/efed88206a6178b84577c1c4b0888756352061db) `rove api` no longer reports a failed engine as a healthy one. `add` returns `.engine` (the vendor, command, model and effort the task actually launches) and warns when `--model` belongs to another vendor (codex handed a `claude-*` id). When an engine with no failure hook, such as codex, dies on screen, `collect` reads `error` with the engine's message instead of `idle`, `read-output` carries it as `engineError`, and `send` into a session already in `error` or `dead` says so with `targetState`. `collect`'s schema entry lists every `.activity.state` value and what it means. — [@Sma1lboy](https://github.com/Sma1lboy)
+
+- [#1146](https://github.com/Sma1lboy/rove/pull/1146) [`3be0fa1`](https://github.com/Sma1lboy/rove/commit/3be0fa17f45e405270c457de38d33ce876d90595) Switching tasks no longer spawns `git rev-parse HEAD` to revalidate the Files pane's branch base: a local worktree's HEAD is read from its git files instead, cutting git spawns per task switch from 2.6 to 1.6. — [@Sma1lboy](https://github.com/Sma1lboy)
+
 ## 0.9.231
 
 ### Patch Changes
