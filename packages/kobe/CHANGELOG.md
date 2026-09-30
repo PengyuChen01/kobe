@@ -1,5 +1,13 @@
 # Changelog
 
+## 0.9.237
+
+### Patch Changes
+
+- [#1162](https://github.com/Sma1lboy/rove/pull/1162) [`5f1ffe5`](https://github.com/Sma1lboy/rove/commit/5f1ffe567f6b5723980d209b2a1bc578170c077a) A task Rove dispatched from another session stops ringing: its completion still toasts, still marks unread, and still lands in the Inbox, but the chime, bell, and desktop notification stay quiet — dispatched work is the fleet's, and the Inbox is where you review it. Tasks you start yourself are unchanged, and so is everything you dispatch from a plain shell (no Rove session behind it). — [@wisp-agent-ai](https://github.com/wisp-agent-ai)
+
+- [#1163](https://github.com/Sma1lboy/rove/pull/1163) [`3b6ab8e`](https://github.com/Sma1lboy/rove/commit/3b6ab8ed59bd8e4cb1df069b4c895bff9a142f06) Inline images from omp now show in a terminal pane under Ghostty and kitty. Rove lifts Kitty graphics commands out of each pane's output and writes them to your terminal (transmits, virtual placements and deletes by id only; `q=2` forced), answers the pane's `CSI 16 t` cell-size query, and launches omp with `PI_FORCE_IMAGE_PROTOCOL=kitty PI_KITTY_PLACEHOLDERS=1 PI_FORCE_HYPERLINKS=1` when the launching Rove runs in such a terminal. — [@Sma1lboy](https://github.com/Sma1lboy)
+
 ## 0.9.236
 
 ### Patch Changes
