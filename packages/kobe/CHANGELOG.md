@@ -1,5 +1,27 @@
 # Changelog
 
+## 0.9.236
+
+### Patch Changes
+
+- [#1160](https://github.com/Sma1lboy/rove/pull/1160) [`d64251e`](https://github.com/Sma1lboy/rove/commit/d64251e90217391f8cd8d0912cf198d1da92cda6) The Settings → Appearance preview now animates the way the real workspace does: its sample task spins and breathes in the chosen state glyphs, its title shimmers when Running title is set to shimmer, and its terminal pane runs the flowing working border in the sample task's colour. Previewing a choice shows the motion before you apply it. — [@Sma1lboy](https://github.com/Sma1lboy)
+
+- [#1160](https://github.com/Sma1lboy/rove/pull/1160) [`d64251e`](https://github.com/Sma1lboy/rove/commit/d64251e90217391f8cd8d0912cf198d1da92cda6) Settings → General → Colorblind diff colours turns the added colour toward blue so added and removed stop being a red/green pair, in the diff view, the Files pane and the sidebar's change counts. Off by default. The diff view now takes its added/removed colours from the active theme instead of fixed green and red. — [@Sma1lboy](https://github.com/Sma1lboy)
+
+- [#1160](https://github.com/Sma1lboy/rove/pull/1160) [`d64251e`](https://github.com/Sma1lboy/rove/commit/d64251e90217391f8cd8d0912cf198d1da92cda6) Reasoning levels carry a fill glyph from `○` (the engine's lowest) to `◉` (its highest) in the Change engine picker and Settings → Auto routing, and a two-cell agent tab row now shows the task's pinned level after the engine name, e.g. `Codex · ◕ high`. — [@Sma1lboy](https://github.com/Sma1lboy)
+
+- [#1160](https://github.com/Sma1lboy/rove/pull/1160) [`d64251e`](https://github.com/Sma1lboy/rove/commit/d64251e90217391f8cd8d0912cf198d1da92cda6) Settings → General gains State glyphs: the task rail, tab strip, Inbox and PR chip can draw with `braille` (the default, unchanged), `starburst` (a spinning ✻ with star badges, needs a font with the Dingbats block), or `ascii` for terminals and fonts without Unicode symbols. — [@Sma1lboy](https://github.com/Sma1lboy)
+
+- [#1161](https://github.com/Sma1lboy/rove/pull/1161) [`3cd40a6`](https://github.com/Sma1lboy/rove/commit/3cd40a61548db822f43951030f17323262abfab3) Rove no longer prints `MaxListenersExceededWarning: 11 resize listeners added to [CliRenderer]` into the terminal when it starts. Every pane and dialog used to add its own resize listener to the renderer; they now share one. — [@Sma1lboy](https://github.com/Sma1lboy)
+
+- [#1153](https://github.com/Sma1lboy/rove/pull/1153) [`4840d84`](https://github.com/Sma1lboy/rove/commit/4840d8494378bfd3a68ae382018907986987a12c) - Resuming a paused routine now waits for its next scheduled time. Before, the routine kept the next-run time it had when you paused it, so the first sweep after resuming logged every occurrence during the pause as `skipped_missed` and could still fire one that came due while it was paused. — [@Sma1lboy](https://github.com/Sma1lboy)
+
+- [#1160](https://github.com/Sma1lboy/rove/pull/1160) [`d64251e`](https://github.com/Sma1lboy/rove/commit/d64251e90217391f8cd8d0912cf198d1da92cda6) A running tab's title in the sidebar now carries a light band that sweeps across it at a steady pace. Settings → General → Running title switches it back to a still title. — [@Sma1lboy](https://github.com/Sma1lboy)
+
+- [#1160](https://github.com/Sma1lboy/rove/pull/1160) [`d64251e`](https://github.com/Sma1lboy/rove/commit/d64251e90217391f8cd8d0912cf198d1da92cda6) Settings → General → Split panes gains two looks: `rail` marks each split with a left accent bar, and `rule` draws a top rule over each split with its name at the right end. — [@Sma1lboy](https://github.com/Sma1lboy)
+
+- [#1160](https://github.com/Sma1lboy/rove/pull/1160) [`d64251e`](https://github.com/Sma1lboy/rove/commit/d64251e90217391f8cd8d0912cf198d1da92cda6) Every task gets its own colour, derived from the theme accent and stable across restarts: the flowing working border runs in the selected task's colour, and each task's sidebar rows carry a thin mark in it. Settings → General → Task colors turns it off. — [@Sma1lboy](https://github.com/Sma1lboy)
+
 ## 0.9.235
 
 ### Patch Changes
