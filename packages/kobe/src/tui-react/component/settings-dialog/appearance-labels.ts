@@ -18,7 +18,14 @@ export function appearanceChoiceLabel(choice: AppearanceChoice, t: ReturnType<ty
     case "focusAccent":
       return t(`settings.general.accent${choice.value.charAt(0).toUpperCase()}${choice.value.slice(1)}`)
     case "splitStyle":
-      return t(choice.value === "box" ? "settings.general.splitBox" : "settings.general.splitLine")
+      return t(
+        {
+          box: "settings.general.splitBox",
+          line: "settings.general.splitLine",
+          rail: "settings.general.splitRail",
+          rule: "settings.general.splitRule",
+        }[choice.value],
+      )
     case "railFold":
       return t(
         {
@@ -31,5 +38,19 @@ export function appearanceChoiceLabel(choice: AppearanceChoice, t: ReturnType<ty
       return t(choice.value === 1 ? "settings.appearance.singleRow" : "settings.appearance.doubleRow")
     case "workingBorder":
       return t(choice.value === "flow" ? "settings.appearance.borderFlow" : "settings.appearance.borderStill")
+    case "taskColors":
+      return t(choice.value === "on" ? "settings.appearance.enabled" : "settings.appearance.disabled")
+    case "glyphSet":
+      return t(
+        {
+          braille: "settings.appearance.glyphsBraille",
+          starburst: "settings.appearance.glyphsStarburst",
+          ascii: "settings.appearance.glyphsAscii",
+        }[choice.value],
+      )
+    case "colorblind":
+      return t(choice.value === "on" ? "settings.appearance.enabled" : "settings.appearance.disabled")
+    case "runningTitle":
+      return t(choice.value === "shimmer" ? "settings.appearance.titleShimmer" : "settings.appearance.titleStill")
   }
 }

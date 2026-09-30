@@ -15,26 +15,25 @@ import type { Task } from "@/types/task"
 import { TextAttributes } from "@opentui/core"
 import { useEffect, useMemo } from "react"
 import { engineDisplayName } from "../../../engine/interactive-command"
-import { charWidth } from "../../../lib/display-width"
+import { engineEntry } from "../../../engine/registry"
+import { charWidth, displayWidth } from "../../../lib/display-width"
 import { relativeAge } from "../../../lib/relative-time"
+import { DEFAULT_RUNNING_TITLE, RUNNING_TITLE_KEY, normalizeRunningTitle } from "../../../state/running-title"
 import { TAB_ROW_HEIGHT_KEY, normalizeTabRowHeight } from "../../../state/tab-row-height"
-import { breathColor, breathGlyph } from "../../../tui/lib/breathe"
+import { breathColor, breathGlyph, mixInk } from "../../../tui/lib/breathe"
+import { effortMark } from "../../../tui/lib/effort-glyph"
 import { truncateEndCells } from "../../../tui/lib/truncate"
 import { currentBranch, pollCurrentBranch } from "../../../tui/panes/sidebar/git-head"
 import { prChip } from "../../../tui/panes/sidebar/row-chips"
-import {
-  ATTENTION_GLYPH,
-  IN_PROGRESS_SPINNER,
-  NO_STATE_GLYPH,
-  buildSidebarRowView,
-  isAttentionActivity,
-  withSpinnerFrame,
-} from "../../../tui/panes/sidebar/row-view"
+import { buildSidebarRowView, isAttentionActivity, withSpinnerFrame } from "../../../tui/panes/sidebar/row-view"
 import { type TreeTab, rowLiveBranchPath, tabRowActivity, worktreeRowLabel } from "../../../tui/panes/sidebar/tree-core"
 import { rowTokenTone, toneColor, truncateBranchLabel } from "../../../tui/panes/sidebar/view-core"
 import { useOptionalKV } from "../../context/kv"
 import { useTheme } from "../../context/theme"
 import { useT } from "../../i18n"
+import { ShimmerLabel } from "../../lib/shimmer-label"
+import { useGlyphs } from "../../lib/use-glyphs"
+import { useTaskColor } from "../../lib/use-task-color"
 import {
   ChangeStats,
   UNKNOWN_CHANGES_MARK,
@@ -83,10 +82,11 @@ export function WorktreeTreeRow(props: {
 }) {
   const { theme } = useTheme()
   const t = useT()
+  const glyphs = useGlyphs()
   const shared = props.shared
   const task = props.task
   const changes = useChanges(shared, task)
-  const chip = prChip(task)
+  const chip = prChip(task, glyphs)
   // Named by BRANCH (`worktreeRowLabel`). Main checkouts and directory/scratch
   // tasks store none and move freely, so they poll their own HEAD.
   const livePath = rowLiveBranchPath(task)
@@ -127,11 +127,12 @@ export function WorktreeTreeRow(props: {
     ((changes?.deleted ?? 0) > 0 ? clusterCells(`−${changes?.deleted}`) : 0) +
     ((changes?.behind ?? 0) > 0 ? clusterCells(`↓${changes?.behind}`) : 0) +
     (moving ? clusterCells(t("tasks.moveChip").trim()) : 0)
+  const mark = useTaskColor(task.id)
   return (
-    <RowShell rowId={props.rowId} flatIndex={props.flatIndex} depth={props.depth ?? 1} shared={shared}>
+    <RowShell rowId={props.rowId} flatIndex={props.flatIndex} depth={props.depth ?? 1} shared={shared} mark={mark}>
       {spinning ? (
         <text fg={breathColor(theme.primary, theme.textMuted, frame)} wrapMode="none" width={2} flexShrink={0}>
-          {`${breathGlyph(IN_PROGRESS_SPINNER, frame)} `}
+          {`${breathGlyph(glyphs.spinner, frame)} `}
         </text>
       ) : null}
       <box flexDirection="row" flexGrow={1} paddingRight={1} gap={1}>
@@ -192,6 +193,7 @@ export function useTabRowBaseView(args: {
   readonly completionSeen: boolean
 }): ReturnType<typeof buildSidebarRowView> {
   const t = useT()
+  const glyphs = useGlyphs()
   const { task, activity, lifecycle, job, completionSeen } = args
   return useMemo(() => {
     // Rebuild on language change: buildSidebarRowView reads the global `t`.
@@ -205,8 +207,9 @@ export function useTabRowBaseView(args: {
       subtitleBudget: 0,
       truncateBranch: truncateBranchLabel,
       completionSeen,
+      glyphs,
     })
-  }, [task, activity, lifecycle, job, completionSeen, t])
+  }, [task, activity, lifecycle, job, completionSeen, t, glyphs])
 }
 
 /**
@@ -223,6 +226,7 @@ export function useTabStateCell(args: {
   readonly viewing: boolean
 }) {
   const { theme } = useTheme()
+  const glyphs = useGlyphs()
   const { task, tab, viewing } = args
   // Only an AGENT tab with daemon-reported activity wears a live state glyph.
   const isAgent = tab.engine === true
@@ -255,8 +259,8 @@ export function useTabStateCell(args: {
   // command, first prompt and all. It must not read `○` ("nothing to do");
   // it takes the dead-engine `!`.
   const restored = tab.restored === true
-  // No daemon signal rests at the same `○` as known-idle. See NO_STATE_GLYPH.
-  const glyph = restored ? ATTENTION_GLYPH : isAgent && carriesState ? rowView.stateGlyph : NO_STATE_GLYPH
+  // No daemon signal rests at the same `○` as known-idle.
+  const glyph = restored ? glyphs.attention : isAgent && carriesState ? rowView.stateGlyph : glyphs.idle
   // Gated on `carriesState`, or a sibling would flash for another tab's turn.
   const pulsing = useDonePulse(carriesState ? completionStampOf(activity) : undefined)
   const fg = pulsing
@@ -268,7 +272,7 @@ export function useTabStateCell(args: {
           ? breathColor(theme.primary, theme.textMuted, frame)
           : toneColor(theme, rowView.tone)
         : theme.textMuted
-  return { activity, carriesState, rowView, glyph, fg, pulsing }
+  return { activity, carriesState, rowView, glyph, fg, pulsing, frame }
 }
 
 export function TabTreeRow(props: {
@@ -283,7 +287,7 @@ export function TabTreeRow(props: {
   const { theme } = useTheme()
   const t = useT()
   const shared = props.shared
-  const { activity, carriesState, rowView, glyph, fg, pulsing } = useTabStateCell({
+  const { activity, carriesState, rowView, glyph, fg, pulsing, frame } = useTabStateCell({
     task: props.task,
     tab: props.tab,
     tabStates: shared.engineTabState?.get(props.task.id),
@@ -299,8 +303,36 @@ export function TabTreeRow(props: {
   const twoCell = normalizeTabRowHeight(kv?.get(TAB_ROW_HEIGHT_KEY, 1)) === 2
   const liveVendor = props.tab.liveVendor ?? null
   const modelLine = props.tab.engine === true && twoCell && liveVendor ? engineDisplayName(liveVendor) : null
+  const mark = useTaskColor(props.task.id)
+  const label = truncateEndCells(
+    props.tab.label,
+    // + the 2-cell state-glyph column.
+    treeLabelBudget(
+      shared,
+      2 +
+        (age ? clusterCells(age) : 0) +
+        (shared.movingRowId === props.rowId ? clusterCells(t("tasks.moveChip").trim()) : 0),
+    ),
+    charWidth,
+  )
+  const shimmer =
+    rowView.loading &&
+    !pulsing &&
+    normalizeRunningTitle(kv?.get(RUNNING_TITLE_KEY, DEFAULT_RUNNING_TITLE)) === "shimmer"
+  // The task's pinned level rides along only when the live engine declares
+  // it (the launch path drops any other), and only if the whole line fits.
+  const level = props.task.modelEffort?.trim() ?? ""
+  const effort = modelLine && liveVendor ? effortMark(engineEntry(liveVendor).effortLevels, level) : null
+  const captionBudget = treeLabelBudget(shared, 2)
+  const showEffort = effort !== null && displayWidth(`${modelLine} · ${effort.glyph} ${level}`) <= captionBudget
   return (
-    <RowShell rowId={props.rowId} flatIndex={props.flatIndex} depth={props.depth ?? 1} shared={props.shared}>
+    <RowShell
+      rowId={props.rowId}
+      flatIndex={props.flatIndex}
+      depth={props.depth ?? 1}
+      shared={props.shared}
+      mark={mark}
+    >
       <text fg={fg} attributes={pulsing ? TextAttributes.BOLD : undefined} wrapMode="none" width={2} flexShrink={0}>
         {`${glyph} `}
       </text>
@@ -314,16 +346,10 @@ export function TabTreeRow(props: {
             flexGrow={1}
             flexShrink={1}
           >
-            {truncateEndCells(
-              props.tab.label,
-              // + the 2-cell state-glyph column.
-              treeLabelBudget(
-                shared,
-                2 +
-                  (age ? clusterCells(age) : 0) +
-                  (shared.movingRowId === props.rowId ? clusterCells(t("tasks.moveChip").trim()) : 0),
-              ),
-              charWidth,
+            {shimmer ? (
+              <ShimmerLabel label={label} tick={frame} muted={theme.textMuted} accent={theme.primary} />
+            ) : (
+              label
             )}
           </text>
           {age ? (
@@ -335,8 +361,17 @@ export function TabTreeRow(props: {
         </box>
         {modelLine ? (
           // Flush with the title (owner call): the pair reads as one block.
-          <text fg={theme.textMuted} attributes={TextAttributes.DIM} wrapMode="none" paddingRight={1}>
-            {truncateEndCells(modelLine, treeLabelBudget(shared, 2), charWidth)}
+          // DIM on spans, not the text: span attributes OR into the parent's,
+          // and the level glyph brightens toward the accent undimmed.
+          <text fg={theme.textMuted} wrapMode="none" paddingRight={1}>
+            <span attributes={TextAttributes.DIM}>
+              {truncateEndCells(modelLine, captionBudget, charWidth)}
+              {showEffort ? " · " : ""}
+            </span>
+            {showEffort ? (
+              <span fg={mixInk(theme.primary, theme.textMuted, effort.fraction)}>{effort.glyph}</span>
+            ) : null}
+            {showEffort ? <span attributes={TextAttributes.DIM}>{` ${level}`}</span> : null}
           </text>
         ) : null}
       </box>

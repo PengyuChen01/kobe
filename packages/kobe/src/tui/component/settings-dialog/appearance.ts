@@ -1,5 +1,9 @@
-import type { SplitStyle } from "../../../state/split-style"
+import { COLORBLIND_MODES, type ColorblindMode } from "../../../state/colorblind"
+import { GLYPH_SET_NAMES, type GlyphSetName } from "../../../state/glyph-set"
+import { RUNNING_TITLES, type RunningTitle } from "../../../state/running-title"
+import { SPLIT_STYLES, type SplitStyle } from "../../../state/split-style"
 import type { TabRowHeight } from "../../../state/tab-row-height"
+import { TASK_COLORS, type TaskColors } from "../../../state/task-colors"
 import { WORKING_BORDERS, type WorkingBorder } from "../../../state/working-border"
 import type { CollapsedRailStyle } from "../../../tui-react/panes/sidebar/collapsed-rail"
 import { type FocusAccentSlot, THEME_MODE_PREFERENCES, type ThemeModePreference } from "../../context/theme-core"
@@ -13,6 +17,10 @@ export const APPEARANCE_SETTINGS = [
   "railFold",
   "tabRowHeight",
   "workingBorder",
+  "taskColors",
+  "glyphSet",
+  "colorblind",
+  "runningTitle",
 ] as const
 export type AppearanceSetting = (typeof APPEARANCE_SETTINGS)[number]
 
@@ -25,6 +33,10 @@ export type AppearanceSnapshot = {
   railFoldStyle: CollapsedRailStyle
   tabRowHeight: TabRowHeight
   workingBorder: WorkingBorder
+  taskColors: TaskColors
+  glyphSet: GlyphSetName
+  colorblind: ColorblindMode
+  runningTitle: RunningTitle
 }
 export type AppearanceChoice =
   | { kind: "theme"; value: string }
@@ -35,6 +47,10 @@ export type AppearanceChoice =
   | { kind: "railFold"; value: CollapsedRailStyle }
   | { kind: "tabRowHeight"; value: TabRowHeight }
   | { kind: "workingBorder"; value: WorkingBorder }
+  | { kind: "taskColors"; value: TaskColors }
+  | { kind: "glyphSet"; value: GlyphSetName }
+  | { kind: "colorblind"; value: ColorblindMode }
+  | { kind: "runningTitle"; value: RunningTitle }
 
 export function appearanceChoices(setting: AppearanceSetting, themes: readonly string[]): AppearanceChoice[] {
   switch (setting) {
@@ -47,13 +63,21 @@ export function appearanceChoices(setting: AppearanceSetting, themes: readonly s
     case "focusAccent":
       return (["primary", "success", "info"] as const).map((value) => ({ kind: setting, value }))
     case "splitStyle":
-      return (["box", "line"] as const).map((value) => ({ kind: setting, value }))
+      return SPLIT_STYLES.map((value) => ({ kind: setting, value }))
     case "railFold":
       return (["glyphs", "initials", "hairline"] as const).map((value) => ({ kind: setting, value }))
     case "tabRowHeight":
       return ([1, 2] as const).map((value) => ({ kind: setting, value }))
     case "workingBorder":
       return WORKING_BORDERS.map((value) => ({ kind: setting, value }))
+    case "taskColors":
+      return TASK_COLORS.map((value) => ({ kind: setting, value }))
+    case "glyphSet":
+      return GLYPH_SET_NAMES.map((value) => ({ kind: setting, value }))
+    case "colorblind":
+      return COLORBLIND_MODES.map((value) => ({ kind: setting, value }))
+    case "runningTitle":
+      return RUNNING_TITLES.map((value) => ({ kind: setting, value }))
   }
 }
 
@@ -75,6 +99,14 @@ export function applyAppearanceChoice(current: AppearanceSnapshot, choice: Appea
       return { ...current, tabRowHeight: choice.value }
     case "workingBorder":
       return { ...current, workingBorder: choice.value }
+    case "taskColors":
+      return { ...current, taskColors: choice.value }
+    case "glyphSet":
+      return { ...current, glyphSet: choice.value }
+    case "colorblind":
+      return { ...current, colorblind: choice.value }
+    case "runningTitle":
+      return { ...current, runningTitle: choice.value }
   }
 }
 
@@ -96,5 +128,13 @@ export function currentAppearanceChoice(current: AppearanceSnapshot, setting: Ap
       return { kind: setting, value: current.tabRowHeight }
     case "workingBorder":
       return { kind: setting, value: current.workingBorder }
+    case "taskColors":
+      return { kind: setting, value: current.taskColors }
+    case "glyphSet":
+      return { kind: setting, value: current.glyphSet }
+    case "colorblind":
+      return { kind: setting, value: current.colorblind }
+    case "runningTitle":
+      return { kind: setting, value: current.runningTitle }
   }
 }

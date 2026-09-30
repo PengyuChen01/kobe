@@ -7,7 +7,15 @@
 import { accessSync, constants as fsConstants, mkdirSync } from "node:fs"
 import { errorMessage } from "@/lib/error-message"
 import { AUTO_STATUS_KEY } from "../../../state/auto-status"
+import { COLORBLIND_KEY, type ColorblindMode, DEFAULT_COLORBLIND, normalizeColorblind } from "../../../state/colorblind"
 import { DISPATCHER_KEY } from "../../../state/dispatcher"
+import { DEFAULT_GLYPH_SET, GLYPH_SET_KEY, type GlyphSetName, normalizeGlyphSet } from "../../../state/glyph-set"
+import {
+  DEFAULT_RUNNING_TITLE,
+  RUNNING_TITLE_KEY,
+  type RunningTitle,
+  normalizeRunningTitle,
+} from "../../../state/running-title"
 import { DEFAULT_SCROLLBACK_ROWS, SCROLLBACK_ROWS_KEY, normalizeScrollbackRows } from "../../../state/scrollback"
 import { RAIL_FOLD_STYLE_KEY } from "../../../state/sidebar-collapsed.ts"
 import {
@@ -30,6 +38,7 @@ import {
   type TabStripMode,
   resolveTabStripMode,
 } from "../../../state/tab-strip"
+import { DEFAULT_TASK_COLORS, TASK_COLORS_KEY, type TaskColors, normalizeTaskColors } from "../../../state/task-colors"
 import {
   DEFAULT_WORKING_BORDER,
   WORKING_BORDER_KEY,
@@ -176,6 +185,30 @@ export function useSettingsPrefs(kv: KVContext, dialog: DialogContext) {
   }
   function selectWorkingBorder(style: WorkingBorder): void {
     kv.set(WORKING_BORDER_KEY, style)
+  }
+  function taskColors(): TaskColors {
+    return normalizeTaskColors(kv.get(TASK_COLORS_KEY, DEFAULT_TASK_COLORS))
+  }
+  function selectTaskColors(value: TaskColors): void {
+    kv.set(TASK_COLORS_KEY, value)
+  }
+  function glyphSet(): GlyphSetName {
+    return normalizeGlyphSet(kv.get(GLYPH_SET_KEY, DEFAULT_GLYPH_SET))
+  }
+  function selectGlyphSet(name: GlyphSetName): void {
+    kv.set(GLYPH_SET_KEY, name)
+  }
+  function colorblind(): ColorblindMode {
+    return normalizeColorblind(kv.get(COLORBLIND_KEY, DEFAULT_COLORBLIND))
+  }
+  function selectColorblind(mode: ColorblindMode): void {
+    kv.set(COLORBLIND_KEY, mode)
+  }
+  function runningTitle(): RunningTitle {
+    return normalizeRunningTitle(kv.get(RUNNING_TITLE_KEY, DEFAULT_RUNNING_TITLE))
+  }
+  function selectRunningTitle(style: RunningTitle): void {
+    kv.set(RUNNING_TITLE_KEY, style)
   }
   // Editor preference: which editor the file tree's `e` key launches.
   function editorKind(): EditorKind {
@@ -325,6 +358,14 @@ export function useSettingsPrefs(kv: KVContext, dialog: DialogContext) {
     selectTabRowHeight,
     workingBorder,
     selectWorkingBorder,
+    taskColors,
+    selectTaskColors,
+    glyphSet,
+    selectGlyphSet,
+    colorblind,
+    selectColorblind,
+    runningTitle,
+    selectRunningTitle,
     remoteProjectsEnabled,
     toggleRemoteProjects,
     autoStatusOn,
