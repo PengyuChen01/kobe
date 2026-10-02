@@ -104,9 +104,21 @@ export function useTreeMenu(deps: TreeMenuDeps): TreeMenu {
     (projectId: string, x: number, y: number): void => {
       const row = tree.rows.find((candidate) => candidate.kind === "project" && candidate.id === projectId)
       if (!row) return
-      openAt(row, {}, x, y)
+      // Only THIS daemon's mains are in the move partition; another machine's
+      // project is read-only here.
+      const movable = (candidate: TreeRow): boolean =>
+        candidate.kind === "project" &&
+        candidate.machineId === "local" &&
+        tree.mainTaskIdOfProject(candidate.id) !== null
+      const mainId = movable(row) ? tree.mainTaskIdOfProject(projectId) : null
+      // The header has no cursor slot; its main row stands in, so "Reorder
+      // project" starts move mode where j/k drag the project.
+      const mainIndex = mainId === null ? -1 : tree.flatIds.indexOf(mainId)
+      if (mainIndex >= 0) setCursorIndex(mainIndex)
+      const firstMovable = tree.rows.find(movable)
+      openAt(row, { projectMovable: mainIndex >= 0, projectFirst: firstMovable?.id === projectId }, x, y)
     },
-    [tree.rows, openAt],
+    [tree.rows, tree.flatIds, tree.mainTaskIdOfProject, openAt, setCursorIndex],
   )
 
   const close = useCallback((): void => setMenu(null), [])
@@ -135,11 +147,14 @@ export function useTreeMenu(deps: TreeMenuDeps): TreeMenu {
       if (row.kind === "project") {
         if (action === "newTask") deps.onAddTask?.()
         if (action === "fieldNotes") actions.onFieldNotesRequest?.(row.repo)
+        const mainId = deps.tree.mainTaskIdOfProject(row.id)
+        if (!mainId) return
         // Same flow as `d` on the project's main checkout row.
-        if (action === "forgetProject") {
-          const mainId = deps.tree.mainTaskIdOfProject(row.id)
-          if (mainId) actions.onDeleteRequest?.(mainId)
-        }
+        if (action === "forgetProject") actions.onDeleteRequest?.(mainId)
+        if (action === "moveToTop") actions.onMoveToTopRequest?.(mainId)
+        // Already moving: the cursor is on this main now, so j/k drag it — a
+        // toggle would leave move mode instead.
+        if (action === "reorder" && !actions.moveMode) actions.onLocalMergeRequest?.(mainId)
         return
       }
       // Only reachable through a stale `menu`.
@@ -165,7 +180,8 @@ export function useTreeMenu(deps: TreeMenuDeps): TreeMenu {
           actions.onPinRequest?.(taskId)
           break
         case "reorder":
-          actions.onLocalMergeRequest?.(taskId)
+          // Same as the project's: opening the menu put the cursor on this row.
+          if (!actions.moveMode) actions.onLocalMergeRequest?.(taskId)
           break
         case "runAgain":
           actions.onRunAgainRequest?.(taskId)
