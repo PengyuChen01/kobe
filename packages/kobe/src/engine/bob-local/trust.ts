@@ -36,7 +36,10 @@ export function trustBobWorktree(worktreePath: string, home: string = homedir())
       }
     },
     (doc) => {
-      const folders = (doc.folders ?? {}) as Record<string, unknown>
+      const folders =
+        doc.folders && typeof doc.folders === "object" && !Array.isArray(doc.folders)
+          ? (doc.folders as Record<string, unknown>)
+          : {}
       if (folders[worktreePath] === TRUSTED) return undefined
       const merged = { ...doc, version: doc.version ?? 1, folders: { ...folders, [worktreePath]: TRUSTED } }
       return `${JSON.stringify(merged, null, 2)}\n`

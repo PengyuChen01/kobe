@@ -35,11 +35,11 @@ export const EMPTY_HISTORY: EngineHistoryReader = {
   },
 }
 
-/** `listSessionFilesForWorktree` is NEWEST-first; the contract is oldest-first. */
 /** Bob keeps one SQLite database instead of per-session files, so the whole
  *  reader is built there; this is the default-home instance. */
 export const bobHistoryReader: EngineHistoryReader = bobHistoryReaderFor()
 
+/** `listSessionFilesForWorktree` is NEWEST-first; the contract is oldest-first. */
 export const claudeHistoryReader: EngineHistoryReader = {
   async listSessionIdsForWorktree(worktree) {
     const files = await claudeHistory.listSessionFilesForWorktree(worktree)
