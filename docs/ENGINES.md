@@ -56,8 +56,8 @@ prompt after launch instead of appending it to the command line.
 **IBM Bob is built in**, for its history and account reads rather than for
 hooks: Bob ships Claude's nested hook schema but nothing fires from it on
 2.0.5, so session identity comes from its history store keyed by worktree,
-the same origin Kimi uses. Rove launches it as `bob chat --trust` — bare
-`bob` prints help, and the first-run folder dialog would otherwise stop every
+the same origin Kimi uses. Rove launches it as `bob chat --trust` — `chat`
+is Bob's TUI subcommand, and the first-run folder dialog would otherwise stop every
 task spawned into a fresh worktree, which is what breaks a parallel round.
 Its first message is pasted rather than appended: `bob chat` declares no
 positional and discards a stray one without an error. Account detection

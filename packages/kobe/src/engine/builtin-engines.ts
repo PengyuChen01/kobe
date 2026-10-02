@@ -167,7 +167,7 @@ export const BUILTIN_ENGINES: Record<BuiltinVendorId, EngineRegistryEntry> = {
     quotaUsage: () => fetchCodexQuotaUsage(),
   },
   /**
-   * IBM Bob Shell. `bob` alone prints help — the TUI is `bob chat`. It is
+   * IBM Bob Shell, launched through its documented TUI subcommand `bob chat`. It is
    * built-in for its history and account reads, not for hooks: Bob's bundle
    * carries Claude's nested hook schema but nothing fired from either the
    * workspace (`<workspace>/.bob/settings.json`) or the global
