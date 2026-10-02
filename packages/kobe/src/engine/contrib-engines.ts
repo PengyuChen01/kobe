@@ -258,7 +258,7 @@ const BOB: EngineScreenManifest = {
 
 /** The shipped catalog. Key = the engine's VendorId. */
 export const CONTRIB_ENGINES: Record<string, ContribEngineSpec> = {
-  // `bob` alone prints help; the TUI is `bob chat`. `--trust` is Bob's own
+  // `bob chat` is the documented TUI subcommand. `--trust` is Bob's own
   // flag for the first-run folder gate — without it every task Rove spawns
   // into a fresh worktree stops on "Do you trust this folder?", which makes a
   // parallel round N dialogs nobody can answer (see `trust-worktree.ts` for

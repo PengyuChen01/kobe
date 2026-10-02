@@ -36,7 +36,7 @@ describe("contrib engine catalog", () => {
     }
   })
 
-  // `bob` alone only prints help, and a fresh worktree stops the TUI on a trust
+  // `bob chat` is the TUI subcommand, and a fresh worktree stops it on a trust
   // dialog — a parallel round would open N of them with nobody to answer.
   it("bob launches the TUI already trusting the worktree", () => {
     expect(engineEntry("bob").defaultCommand).toEqual(["bob", "chat", "--trust"])
