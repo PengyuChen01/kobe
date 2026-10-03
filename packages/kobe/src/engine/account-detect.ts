@@ -67,7 +67,7 @@ export type KimiAccount = { kind: "oauth" } | { kind: "none" }
  * shows would have to be decoded out of the token, which Rove does not do to
  * credential material.
  */
-export type BobAccount = { kind: "signed-in" } | { kind: "none" }
+export type BobAccount = { kind: "oauth" } | { kind: "none" }
 
 export type BinaryStatus = { found: true; path: string } | { found: false; error: string }
 
@@ -425,7 +425,7 @@ export async function detectBobAccount(deps: DetectDeps = defaultDeps): Promise<
   const signedIn = Object.entries(parsed).some(
     ([key, value]) => key.startsWith("bob.auth.tokens-") && typeof value === "string" && value.length > 0,
   )
-  return { binary, account: signedIn ? { kind: "signed-in" } : { kind: "none" } }
+  return { binary, account: signedIn ? { kind: "oauth" } : { kind: "none" } }
 }
 
 export async function detectKimiAccount(deps: DetectDeps = defaultDeps): Promise<EngineAccountStatus<KimiAccount>> {

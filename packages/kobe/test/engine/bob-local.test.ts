@@ -12,6 +12,7 @@ import { beforeAll, describe, expect, it } from "vitest"
 import { detectBobAccount } from "../../src/engine/account-detect.ts"
 import { bobHistoryReaderFor } from "../../src/engine/bob-local/history.ts"
 import { trustBobWorktree } from "../../src/engine/bob-local/trust.ts"
+import { describeAccount } from "../../src/engine/engine-status.ts"
 import { bobDbPath, bobTrustPath } from "../../src/engine/vendor-home.ts"
 
 const WORKTREE = "/tmp/wt/alpha"
@@ -142,7 +143,9 @@ describe("bob account detection", () => {
       "bob.auth.tokens-https://api.eu-de.bob.ibm.com": "opaque",
       "bob.telemetry.sessionId": "x",
     })
-    expect((await detectBobAccount(deps({ [secrets]: raw }))).account).toEqual({ kind: "signed-in" })
+    const { account } = await detectBobAccount(deps({ [secrets]: raw }))
+    expect(describeAccount(account)).toBe("logged in")
+    expect(account).toEqual({ kind: "oauth" })
   })
 
   it("reads telemetry-only or missing state as signed out", async () => {
