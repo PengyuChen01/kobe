@@ -173,7 +173,8 @@ export const BUILTIN_ENGINES: Record<BuiltinVendorId, EngineRegistryEntry> = {
    * workspace (`<workspace>/.bob/settings.json`) or the global
    * (`~/.bob/settings/settings.json`) document on 2.0.5, and no feature flag
    * names one. Session identity therefore comes from the history store keyed
-   * by worktree, the same origin kimi uses.
+   * by worktree. No resume command is registered, so restarting a Bob tab
+   * launches a new conversation.
    *
    * `--trust` stays in the command even though `trustWorktree` writes the
    * same record: the hook is best-effort and must never block a launch, and a

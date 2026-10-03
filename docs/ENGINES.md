@@ -53,20 +53,22 @@ badges. A catalog entry also declares how its CLI takes a first message:
 OpenCode's positional argument is a project directory, so Rove pastes the
 prompt after launch instead of appending it to the command line.
 
+Settings → Engines lists them (and your own registered engines) with their
+binary discovery, and that is all detection can answer for them. No
+login state, history, or model picker; those need a real adapter, which is
+what promotes an engine to built-in.
+
 **IBM Bob is built in**, for its history and account reads rather than for
 hooks: Bob ships Claude's nested hook schema but nothing fires from it on
 2.0.5, so session identity comes from its history store keyed by worktree,
-the same origin Kimi uses. Rove launches it as `bob chat --trust` — `chat`
+but Rove does not resume Bob conversations across tab restarts. Restarting
+a Bob tab launches a new conversation. Rove launches it as `bob chat --trust` — `chat`
 is Bob's TUI subcommand, and the first-run folder dialog would otherwise stop every
 task spawned into a fresh worktree, which is what breaks a parallel round.
 Its first message is pasted rather than appended: `bob chat` declares no
 positional and discards a stray one without an error. Account detection
 reports whether you are signed in, not who — Bob keeps only an opaque token,
 and Rove does not decode credential material.
-Settings → Engines lists them (and your own registered engines) with their
-binary discovery, and that is all detection can answer for them. No
-login state, history, or model picker; those need a real adapter, which is
-what promotes an engine to built-in.
 
 **Plugins can contribute engines too**: a plugin manifest's `[[engines]]`
 entries register engines with a display name, launch command, screen
@@ -97,10 +99,10 @@ it, so Rove assumes you meant it.
 ### Reasoning effort
 
 Codex accepts `none`, `low`, `medium`, `high`, `xhigh`, `max`, passed as
-`-c model_reasoning_effort=<level>`. Pi and OMP take the same levels (plus
-`off`) as `--thinking <level>`. The remaining engines have no effort flag
-Rove can drive; a selected effort is ignored there rather than passed
-through.
+`-c model_reasoning_effort=<level>`. Pi and OMP take `off`, `minimal`, `low`,
+`medium`, `high`, `xhigh`, `max` as `--thinking <level>` — `minimal` in place
+of Codex's `none`, plus `off`. The remaining engines have no effort flag Rove
+can drive; a selected effort is ignored there rather than passed through.
 
 Three places select one:
 

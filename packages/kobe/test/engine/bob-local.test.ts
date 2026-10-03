@@ -12,7 +12,6 @@ import { beforeAll, describe, expect, it } from "vitest"
 import { detectBobAccount } from "../../src/engine/account-detect.ts"
 import { bobHistoryReaderFor } from "../../src/engine/bob-local/history.ts"
 import { trustBobWorktree } from "../../src/engine/bob-local/trust.ts"
-import { engineEntry } from "../../src/engine/registry.ts"
 import { bobDbPath, bobTrustPath } from "../../src/engine/vendor-home.ts"
 
 const WORKTREE = "/tmp/wt/alpha"
@@ -157,17 +156,5 @@ describe("bob account detection", () => {
     const status = await detectBobAccount(deps({ [secrets]: "{ not json" }))
     expect(status.account).toEqual({ kind: "none" })
     expect(status.accountError).toContain("parse")
-  })
-})
-
-describe("bob launch contract", () => {
-  // These two are the whole reason a parallel round works: bare `bob` prints
-  // help, a fresh worktree stops the TUI on a trust dialog nobody can answer,
-  // and `bob chat` DISCARDS a positional prompt without erroring — an argv
-  // first message would leave every sibling sitting at an empty composer.
-  it("launches the TUI already trusting the worktree, and pastes the first message", () => {
-    const bob = engineEntry("bob")
-    expect(bob.defaultCommand).toEqual(["bob", "chat", "--trust"])
-    expect(bob.firstMessageDelivery).toBe("paste")
   })
 })

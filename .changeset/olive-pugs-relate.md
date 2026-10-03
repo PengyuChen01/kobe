@@ -2,8 +2,8 @@
 "@sma1lboy/rove": patch
 ---
 
-Promoted IBM Bob from the shipped catalog to a built-in engine, so Rove reads its conversation rather than only launching it.
+Added IBM Bob as a built-in engine with conversation history, per-session token and context counts, worktree session discovery, and signed-in status from its local store. Rove checks for an opaque token without decoding credentials.
 
-History, per-session token and context counts, and the sessions belonging to a worktree all come out of Bob's SQLite store; Settings → Engines now reports whether you are signed in, not who, because Bob keeps only an opaque token and Rove does not decode credential material. Workspace trust is pre-written the way it already is for Claude, Codex, Kimi and Copilot, so a parallel round no longer depends on the launch flag alone.
+Rove launches `bob chat --trust`, pre-writes workspace trust, and pastes the first message because Bob does not accept a positional prompt. Bob can be selected for parallel rounds with `rove api add --agents bob:3 --prompt "…"`.
 
-Hooks are the one thing Bob does not get: its bundle carries Claude's nested hook schema, but nothing fires from either the workspace or the global settings document on 2.0.5, so session identity comes from the history store keyed by worktree instead — the same origin Kimi uses.
+The screen manifest recognizes command approval, folder trust, and browser sign-in as blocked, streaming as working, and the resting composer as idle. Bob 2.0.5 does not fire the tested hooks, so Rove discovers sessions through history. Bob conversations do not resume across tab restarts.

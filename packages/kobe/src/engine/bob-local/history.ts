@@ -24,7 +24,6 @@ import { bobQuery } from "./db.ts"
 
 interface TaskRow {
   id: string
-  updated_at: number
 }
 interface MessageRow {
   role: string
@@ -76,7 +75,7 @@ function neutralRole(role: string): Message["role"] | null {
 
 async function listSessionIdsForWorktree(worktree: string, home?: string): Promise<readonly string[]> {
   const rows = await bobQuery<TaskRow>(
-    "SELECT id, updated_at FROM tasks WHERE json_extract(env, '$.workspace') = ? ORDER BY created_at ASC",
+    "SELECT id FROM tasks WHERE json_extract(env, '$.workspace') = ? ORDER BY created_at ASC",
     [worktree],
     home,
   )
